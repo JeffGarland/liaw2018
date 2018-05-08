@@ -25,6 +25,8 @@ Maintaining a library that supports both boost and std types is complex and time
 
 As a concrete example, boost.date-time users boost::shared_ptr for the management of time zone types.  With most users at C++11 it would make more sense for this interface to support std::shared_ptr instead.
 
+*** All libraries with shared_ptr interfaces
+
 ** Using deprecated std types
 
 The primary example here is std::auto_ptr.  Modern compilers in C++17 and higher versions now warn about auto_ptr being deprecated.  Having boost libraries trigger compiler warnings lowers quality for users.
