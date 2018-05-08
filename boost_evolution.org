@@ -111,9 +111,9 @@ The first LTS target would support C++98 users.
   Gradual deprecation of older compiler and standard support.
   Provide at least 6 years (2 backward versions) of back support
 
-  in 2018 LTS will move to C++11 and C++98 will be dropped
-  in 2020 LTS will move to C++14 and 11 will be dropped
-  in 2023 LTS will move to C++20 and 14 will be dropped
+  in 2019 LTS will move to C++11 and C++98 will be dropped
+  in 2021 LTS will move to C++14 and 11 will be dropped
+  in 2024 LTS will move to C++20 and 14 will be dropped
 
 *** dropping of std:: replaced libraries
 
@@ -121,7 +121,7 @@ The first LTS target would support C++98 users.
   libraries that overlap with standard, but provide more advanced features (boost.thread for example) would tend to be included
 
 *** step 0
-  - first LTS release targeted for 2018 with last support for C++98
+  - first LTS release targeted for 2019 with last support for C++98
   - first .advanced release targeted for same time
     -- .advanced will drop libraries any, bind, lexical_cast, variant, optional
 
