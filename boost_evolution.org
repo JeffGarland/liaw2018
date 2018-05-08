@@ -1,0 +1,126 @@
+
+* Maintaining Boost Libraries in Face of Rapidly Advancing Std C++
+
+The C++ library and language is now evolving at an unprecidented rate. This rapid evolution creates issues for boost library maintainers and users.  For maintainers keeping libraries operating with new C++ features and types requires significant effort. The user community has diverse needs including support for older C++ versions as well as newer standards.  
+
+As of this writing (May 2018) a poll of C++Now participants demonstrated majority C++11 usage with significant C++14 and C++17 usage.
+
+The following outlines some of the issues and potential solutions discussed during LIAW 2017 and 2018.
+
+* Rapid Standards Evolution
+
+New C++ language and library features are being added rapidly.  C++17
+added at least 100 new features and C++20 features already voted 
+into the standards (aka concepts) track will make large changes as well. 
+
+** New std Library types
+
+The list of new library types since C++11 in the standard is long including std::optional, std::variant, std::shared_ptr, std::tuple, etc.  Many of these 'vocabulary types' are derived from similar boost types creating a tension for library authors about what to prefer.
+
+Users that are writing programs with C++11 and beyond will use these types and expect boost libraries to use and support them. It is acknoledged that some users will use boost components instead of std components due to feature extensions 
+
+Maintaining a library that supports both boost and std types is complex and time consuming.  Also, some users would prefer a smaller version of boost that drops boost libraries now provided in the standard including: any, atomic, bind, endian, filesystem, lexical_cast, optional, regex, system, thread, and variant.  This list will grow in C++20 and beyond.
+
+*** Example: date-time using boost::shared_ptr for time zones
+
+As a concrete example, boost.date-time users boost::shared_ptr for the management of time zone types.  With most users at C++11 it would make more sense for this interface to support std::shared_ptr instead.
+
+** Using deprecated std types
+
+The primary example here is std::auto_ptr.  Modern compilers in C++17 and higher versions now warn about auto_ptr being deprecated.  Having boost libraries trigger compiler warnings lowers quality for users.
+
+A number of libraries use auto_ptr including asio, date-time, python, program_options, iostreams, assign, ptr_container, locale, and serialization.
+
+The fix for auto_ptr is relatively straight forward.  Change to std::unique_ptr for c++11 mode and beyond.
+
+** Language features
+
+Some language features such as concepts and constexpr can radically impact the interfaces and construction of libraries.
+
+*** constexpr (C++11)
+
+Libraries supporting constexpr in interfaces are not compatible with pre C++11 versions of C++. For some types of libraries supporting constexpr interfaces is highly desired since it leads to higher runtime performance due to pre-computed compile time values.
+
+*** constexpr static construction (C++17)
+
+C++17 guarantees construction of header defined static values  This is an extremely valuable guaranteed for authors desiring header only implementations that need statically defined data.  
+
+date-time is an example of a library that could trivially be made header only due to this guarantee.
+
+*** deduction guides (C++17)
+
+Deduction guides can simplify a user interface to a library.  This is C++17 and beyond only.  As an example from https://github.com/tvaneerd/cpp17_in_TTs/blob/master/ALL_IN_ONE.md
+
+ //c++14
+ pair<int, string> is1 = pair<int, string>(17, "hello");
+ auto is2 = std::pair<int, string>(17, "hello");
+ auto is3 = std::make_pair(17, string("hello"));
+ auto is4 = std::make_pair(17, "hello"s);
+
+	
+ //c++17
+ pair<int, string> is1 = pair(17, "hello");
+ auto is2 = pair(17, "hello"); // !! pair<int, char const *>
+ auto is3 = pair(17, string("hello"));
+ auto is4 = pair(17, "hello"s);
+
+*** if constexpr (C++17)
+
+
+*** Features in C++20 and Beyond
+
+Concepts will radically transform the construction of template libraries. Modules will also begin to transform library development as well. While the timing and details of these features are still being debated all expectations are that they will arrive and boost will need to respond.
+
+** Implementation headaches for library authors
+
+-- Maintaining boost libraries is difficult to start.
+-- No one will want to be a boost author if mired in c++98
+-- Supporting legacy C++ compilers is a burden
+
+-- #ifdef for all these c++ versions is painful and reduces maintainability
+
+* Potential Directions Forward
+
+** Do nothing
+
+-- let things continue to fester
+-- provide no guidance 
+
+** Individual library split 
+
+-- Define standards and tools for developers to move to newer C++ versions
+-- boostNN (aka boost17) namespace could be used to delinate libraries
+-- individual authors/community support teams decide when to drop
+
+** Split into 2 - long term support (LTS) and boost.advanced
+
+*** LTS Version of Boost 
+
+This distribution of boost would support users with legacy needs.  In general the following would apply:
+ - no new libraries added to LTE
+ - critical bug fixes only
+ - one release annually 
+
+The first LTS target would support C++98 users.
+
+*** roadmap for evolution
+
+  Standard is now on 3 year cycles  
+  Gradual deprecation of older compiler and standard support.
+  Provide at least 6 years (2 backward versions) of back support
+
+  in 2018 LTS will move to C++11 and C++98 will be dropped
+  in 2020 LTS will move to C++14 and 11 will be dropped
+  in 2023 LTS will move to C++20 and 14 will be dropped
+
+*** dropping of std:: replaced libraries
+
+  done on a case by case basis, but dependent libraries will generally prefer std version
+  libraries that overlap with standard, but provide more advanced features (boost.thread for example) would tend to be included
+
+*** step 0
+  - first LTS release targeted for 2018 with last support for C++98
+  - first .advanced release targeted for same time
+    -- .advanced will drop libraries any, bind, lexical_cast, variant, optional
+
+    
