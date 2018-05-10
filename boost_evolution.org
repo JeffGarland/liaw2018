@@ -159,9 +159,9 @@ It has been suggested that libraries information would include details about C++
 
 The proposal is for a gradual deprecation of older compiler and standard support. The advanced version will continue to support older C++versions for at least 6 years and LTS for 9 years.
 
-  -- 2019 LTS will move to C++11 and C++98 will be dropped, advanced to 14
-  -- 2021 LTS will move to C++14 and 11 will be dropped, advanced to 17
-  -- 2024 LTS will move to C++20 and 14 will be dropped, advanced to 20
+  - 2019 LTS will move to C++11 and C++98 will be dropped, advanced to 14
+  - 2021 LTS will move to C++14 and 11 will be dropped, advanced to 17
+  - 2024 LTS will move to C++20 and 14 will be dropped, advanced to 20
 
 *** dropping of std:: replaced libraries in advanced
 
@@ -173,10 +173,10 @@ However, libraries that provide more advanced features than std, boost.thread or
 
 The following is a more detailed outline of an approach for discussion:
 
-  -- 2018 will become last full release with support for c++98/03
-  -- first LTS release targeted for 2019 with minimum c++11 support
+  - 2018 will become last full release with support for c++98/03
+  - first LTS release targeted for 2019 with minimum c++11 support
      -- subsequent LTS releases will continue with 1.xx release name
-  -- 2019 first advanced release
+  - 2019 first advanced release
     -- will drop libraries any, array, compatability, for_each, function_types (replaced by CallableTraits), integer, min_max, signals1, swap, typeof
     -- to be discussed library removals include assign, bind, call traits, enable_if, lambda, lexical_cast, member function, move, result_of, value_initialized
     -- testing will only target c++14 and beyond
