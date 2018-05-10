@@ -1,0 +1,36 @@
+* Boost Code Guidance
+
+The following is a WIP on code guidance for moderizing legacy boost libraries.
+
+** std::auto_ptr -- the problem
+
+The primary example here is std::auto_ptr.  Modern compilers in C++17 and higher versions now warn about auto_ptr being deprecated.  Having boost libraries trigger compiler warnings lowers quality for users.
+
+A number of libraries use auto_ptr including asio, date-time, python, program_options, iostreams, assign, ptr_container, locale, and serialization.
+
+The fix for auto_ptr is relatively straight forward.  Change to std::unique_ptr for c++11 mode and beyond.  
+
+Michael Caisse has pointed out there are some cases in boost where this is not possible.  These would be Howard H. code that uses auto_ptr. 
+
+** solutions in boost.config
+
+A basic solution is to modify the library using the BOOST_NO_CXX11_SMART_PTR macro.  
+
+#+BEGIN_SRC <c++>
+  #if defined(BOOST_NO_CXX11_SMART_PTR)
+      std::auto_ptr< const facet_def > f(create_facet_def(a));
+  #else
+      std::unique_ptr< const facet_def > f(create_facet_def(a));
+  #endif
+#+END_SRC
+
+
+Library authors can include `boost/config/nocpp11/auto_ptr.hpp` to see the boost::unique_or_auto<T> template. This type will resolve to std::auto if compiled in an environment without c++11.  Otherwise, it resolve to std::unique.
+
+#+BEGIN_SRC <cpp>
+  #include "boost/config/nocpp11/auto_ptr.hpp"
+  boost::unique_or_auto< const facet_def > f(create_facet_def(a));
+#+END_SRC
+
+
+
