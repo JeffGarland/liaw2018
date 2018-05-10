@@ -17,15 +17,27 @@ into the standards (aka concepts) track will make large changes as well.
 
 The list of new library types since C++11 in the standard is long including std::optional, std::variant, std::shared_ptr, std::tuple, etc.  Many of these 'vocabulary types' are derived from similar boost types creating a tension for library authors about what to prefer.
 
-Users that are writing programs with C++11 and beyond will use these types and expect boost libraries to use and support them. It is acknoledged that some users will use boost components instead of std components due to feature extensions 
+Users that are writing programs with C++11 and beyond will use these types and expect boost libraries to use and support them. It is acknoledged that some users will use boost components instead of std components due to feature extensions offered by boost.
 
 Maintaining a library that supports both boost and std types is complex and time consuming.  Also, some users would prefer a smaller version of boost that drops boost libraries now provided in the standard including: any, atomic, bind, endian, filesystem, lexical_cast, optional, regex, system, thread, and variant.  This list will grow in C++20 and beyond.
+
+*** shared_ptr interfaces in boost
+
+
+A particularly sticky case is boost::shared_ptr dependencies.  
 
 *** Example: date-time using boost::shared_ptr for time zones
 
 As a concrete example, boost.date-time users boost::shared_ptr for the management of time zone types.  With most users at C++11 it would make more sense for this interface to support std::shared_ptr instead.
 
-*** All libraries with shared_ptr interfaces
+Note this decision has some negative consequences for users of boost::shared_ptr.  In particular it means they cannot use other varations of shared_ptr that may eventually get into the standard. Thanks to Glen Ferandes pointed out this issue.
+
+So perhaps the better advice is for library authors to allow templatization on the pointer return type -- this would need to be prototyped.
+
+*** Other boost library of shared_ptr
+
+Libraries using shared_ptr in interface include: algorithm, asio, beast, contract, date-time, dll, exception, geometry, get_pointer, graph, iterator, locale, log, mpi, pointer_cast, process, program_options, property_map, python, serialization, signals, signals2, interprocess, iostreams, serialization,  shared_container, spirit, startechart, thread, type_erasure, type_index, uuid, wave.
+
 
 ** Using deprecated std types
 
@@ -33,7 +45,9 @@ The primary example here is std::auto_ptr.  Modern compilers in C++17 and higher
 
 A number of libraries use auto_ptr including asio, date-time, python, program_options, iostreams, assign, ptr_container, locale, and serialization.
 
-The fix for auto_ptr is relatively straight forward.  Change to std::unique_ptr for c++11 mode and beyond.
+The fix for auto_ptr is relatively straight forward.  Change to std::unique_ptr for c++11 mode and beyond.  
+
+Michael Caisse has pointed out there are some cases in boost where this is not possible.  These would be Howard H. code that uses auto_ptr. 
 
 ** Language features
 
@@ -66,6 +80,8 @@ Deduction guides can simplify a user interface to a library.  This is C++17 and 
  auto is3 = pair(17, string("hello"));
  auto is4 = pair(17, "hello"s);
 
+Note that without deduction guides for many of the boost container type libraries there is a risk of users used to using shortened names from std:: will get surprising results with boost. 
+
 *** if constexpr (C++17)
 
 
@@ -73,20 +89,22 @@ Deduction guides can simplify a user interface to a library.  This is C++17 and 
 
 Concepts will radically transform the construction of template libraries. Modules will also begin to transform library development as well. While the timing and details of these features are still being debated all expectations are that they will arrive and boost will need to respond.
 
+
 ** Implementation headaches for library authors
 
 -- Maintaining boost libraries is difficult to start.
 -- No one will want to be a boost author if mired in c++98
 -- Supporting legacy C++ compilers is a burden
-
 -- #ifdef for all these c++ versions is painful and reduces maintainability
+-- Limited community maintenance resources are already strained
+
 
 * Potential Directions Forward
 
 ** Do nothing
 
 -- let things continue to fester
--- provide no guidance 
+-- provide no guidance
 
 ** Individual library split 
 
@@ -96,33 +114,82 @@ Concepts will radically transform the construction of template libraries. Module
 
 ** Split into 2 - long term support (LTS) and boost.advanced
 
+The C++ standard is now on 3 year cycles.  This proposal would put boost on a similar schedule.  The library collection would split into 2 major release streams: LTS and advanced. LTS would support users compiling in older versions of c++ and recieve minimal maintenance.  Advanced would track closer to the latest c++ standard.  Every 3 years advanced will drop support for a six year old version of the standard and LTS will drop support for a 9 year old c++ version.  
+
+Note that this proposal is a suggestion for best practice and does not override the library author perogative to support a wider range of c++ versions.  
+
 *** LTS Version of Boost 
 
-This distribution of boost would support users with legacy needs.  In general the following would apply:
- - no new libraries added to LTE
- - critical bug fixes only
- - one release annually 
+This distribution of boost would support users with legacy c++ needs.  In general the following would apply:
 
-The first LTS target would support C++98 users.
+ - will continue to maintain libraries in later c++ versions (any, variant, etc)
+ - no new libraries added to LTE unless explicitly requested by library author
+ - critical bug fixes only
+ - approximately one release annually
+ - tested only against earlier c++ versions and compilers
+
+The first LTS target would support C++98/03 users and would coorespond would be the first 2019 release and would be the continuation of the boost1_xx series. 
+
+*** Advanced Version of Boost 
+
+
+The advanced version will drop support for older C++ versions freeing library authors from maintaining backward compatibility. Overall the following applies:
+
+ - no testing of older/dropped c++versions
+ - no expectation of library support for older c++versions
+ - removal of boost libraries available in std
+ - adoption of latest c++ standard features
+ - removal of older compilers from the tests that do not support newer c++versions
+ - expect library interface breaking changes as libraries are updated for new std types
+ - removal of version 1 libraries that have moved to version 2
+
+*** 'V2' of Libraries
+
+For some libraries with extensive changes due to standard impacts breaking changes may be done by creating a version 2 of the library.  This already has precedence in boost, but may happen more now that the standard is evolving quickly.
+
+*** Forwarding to std::
+
+For some libraries in the advanced release it may make sense to provide a gradual transtion by forwarding to std:: types where possible.
+
+*** C++ Version information by library
+
+It has been suggested that libraries information would include details about C++ version support.  This might be in the form of badges for each of the various c++ versions. Note that criteria would need to be created to achieve a given badge.
 
 *** roadmap for evolution
 
-  Standard is now on 3 year cycles  
-  Gradual deprecation of older compiler and standard support.
-  Provide at least 6 years (2 backward versions) of back support
+The proposal is for a gradual deprecation of older compiler and standard support. The advanced version will continue to support older C++versions for at least 6 years and LTS for 9 years.
 
-  in 2019 LTS will move to C++11 and C++98 will be dropped
-  in 2021 LTS will move to C++14 and 11 will be dropped
-  in 2024 LTS will move to C++20 and 14 will be dropped
+  -- 2019 LTS will move to C++11 and C++98 will be dropped, advanced to 14
+  -- 2021 LTS will move to C++14 and 11 will be dropped, advanced to 17
+  -- 2024 LTS will move to C++20 and 14 will be dropped, advanced to 20
 
-*** dropping of std:: replaced libraries
+*** dropping of std:: replaced libraries in advanced
 
-  done on a case by case basis, but dependent libraries will generally prefer std version
-  libraries that overlap with standard, but provide more advanced features (boost.thread for example) would tend to be included
+This would be done on a case by case basis, but dependent libraries will generally prefer std version libraries that overlap with standard.  In particular, this would apply to libraries that are not changing and are part of community maintenance. Examples include boost.any and boost.array.
 
-*** step 0
-  - first LTS release targeted for 2019 with last support for C++98
-  - first .advanced release targeted for same time
-    -- .advanced will drop libraries any, bind, lexical_cast, variant, optional
+However, libraries that provide more advanced features than std, boost.thread or boost.smart_ptr for example, would continue in boost as an option for users.  These libraries also have active maintainers and may lead to additional standards evolution. 
 
-    
+*** Next steps
+
+The following is a more detailed outline of an approach for discussion:
+
+  -- 2018 will become last full release with support for c++98/03
+  -- first LTS release targeted for 2019 with minimum c++11 support
+     -- subsequent LTS releases will continue with 1.xx release name
+  -- 2019 first advanced release
+    -- will drop libraries any, array, compatability, for_each, function_types (replaced by CallableTraits), integer, min_max, signals1, swap, typeof
+    -- to be discussed library removals include assign, bind, call traits, enable_if, lambda, lexical_cast, member function, move, result_of, value_initialized
+    -- testing will only target c++14 and beyond
+    -- advanced releases will be called boost2.x signalling a major revision
+
+*** Implications
+ 
+The proposal will have implications for external entities that ship boost.  For example Linux distributions will need to decide which version of boost to include.  However, by providing a regular release plan these parties will know what to expect from Boost evolution.
+
+The proposal would require some additional management in GIT for libraries supported in both LTS and advanced. 
+
+There is also the potential to strain already limited release team resources.  Beside the obvious recruitment of additional resources, we can keep the number of releases the same with 1 LTS release and as 2-3 advanced releases.
+
+The proposal will should gradually reduce library interdependence as older libraries move toward depending more on std:: for things like shared_ptr. 
+
+
