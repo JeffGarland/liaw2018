@@ -4,7 +4,9 @@ The following is a WIP on code guidance for moderizing legacy boost libraries.
 ## std::shared_ptr
 It is recommended to prefer std::shared_ptr over boost::shared_ptr.
 
-To minimize impact to library users who already use the following macro (where it makes sense):
+If the usage of shared_ptr is purely internal to the library and if there is no specific need for boost::shared_ptr, then just replace the shared_ptr with std::shared_ptr.
+
+However, to minimize the impact to library users who already use the following macro (where it makes sense):
 
 > SELECTED\_SHARED_PTR
 
