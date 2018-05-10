@@ -25,7 +25,7 @@ A basic solution is to modify the library using the BOOST_NO_CXX11_SMART_PTR mac
 #+END_SRC
 
 
-Library authors can include `boost/config/nocpp11/auto_ptr.hpp` to see the boost::unique_or_auto<T> template. This type will resolve to std::auto if compiled in an environment without c++11.  Otherwise, it resolve to std::unique.
+Library authors can include `boost/config/nocpp11/auto_ptr.hpp` to see the boost::unique_or_auto<T> template. This type will resolve to std::auto if compiled in an environment without c++11.  Otherwise, it resolve to std::unique_ptr.
 
 #+BEGIN_SRC <cpp>
   #include "boost/config/nocpp11/auto_ptr.hpp"
