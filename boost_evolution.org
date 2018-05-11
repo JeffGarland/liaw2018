@@ -13,13 +13,13 @@ New C++ language and library features are being added rapidly.  C++17
 added at least 100 new features and C++20 features already voted 
 into the standards (aka concepts) track will make large changes as well. 
 
-The issue of Boost libraries tracking this standard is only going to increase over time.  There's at least a few different scenarios for boost libraries including:
+The issue of Boost libraries tracking this standard is only going to increase over time.  There's at least a few different scenarios for impacts to boost libraries including:
  
  - drop in replacement: library is now in std (addressof, enable_if)
  - partial replacement: library is in std, but has differences (thread, shared_ptr)
  - library is in std, but quite different (date_time)
- - library replaced by a lanauge feature (foreach, lambda)
-
+ - library replaced by a langauge feature (foreach, lambda)
+ - library that references a type (like shared_ptr) changed in std
 
 ** New std Library types
 
@@ -61,8 +61,6 @@ A number of libraries use auto_ptr including asio, date-time, python, program_op
 The following libraries have already worked around this issue as of 1.67 using boost.config macros: date-time, iostreams, ptr_container, python.
 
 The fix for auto_ptr is relatively straight forward.  Change to std::unique_ptr for c++11 mode and beyond.  
-
-Michael Caisse has pointed out there are some cases in boost where this is not possible.  These would be Howard H. code that uses auto_ptr. 
 
 
 ** Language features
@@ -142,7 +140,7 @@ Note that this proposal is a suggestion for best practice and does not override 
 This distribution of boost would support users with legacy c++ needs.  In general the following would apply:
 
  - will continue to maintain libraries in later c++ versions (any, variant, etc)
- - no new libraries added to LTE unless explicitly requested by library author
+ - no new libraries added to LTS unless explicitly requested by library author
  - critical bug fixes only
  - approximately one release annually
  - tested only against earlier c++ versions and compilers
@@ -152,7 +150,9 @@ The first LTS target would support C++98/03 users and would coorespond would be 
 *** Advanced Version of Boost 
 
 
-The advanced version will drop support for older C++ versions freeing library authors from maintaining backward compatibility. Overall the following applies:
+The advanced version will drop support for older C++ language versions freeing library authors from maintaining backward compatibility. The advanced version of boost will trail the standard by approximately 2 standard releases. So the first advanced version would be Boost 11.
+
+Overall the following applies:
 
  - no testing of older/dropped c++versions
  - no expectation of library support for older c++versions
@@ -160,7 +160,7 @@ The advanced version will drop support for older C++ versions freeing library au
  - adoption of latest c++ standard features
  - removal of older compilers from the tests that do not support newer c++versions
  - expect library interface breaking changes as libraries are updated for new std types
- - removal of version 1 libraries that have moved to version 2
+ - removal of version 1 libraries
 
 *** 'V2' of Libraries
 
@@ -182,6 +182,12 @@ The proposal is for a gradual deprecation of older compiler and standard support
   - 2021 LTS will move to C++14 and 11 will be dropped, advanced to 17
   - 2024 LTS will move to C++20 and 14 will be dropped, advanced to 20
 
+The follwoing timeline shows an example of the concept.  Dates aren't meant to be specific...
+
+#+caption: Example timeline
+[[[[file:boost_release.png]]]]
+
+
 *** dropping of std:: replaced libraries in advanced
 
 This would be done on a case by case basis, but dependent libraries will generally prefer std version libraries that overlap with standard.  In particular, this would apply to libraries that are not changing and are part of community maintenance. Examples include boost.any and boost.array.
@@ -196,8 +202,16 @@ The following is a more detailed outline of an approach for discussion:
   - first LTS release targeted for 2019 with minimum c++11 support
      + subsequent LTS releases will continue with 1.xx release name
   - 2019 first advanced release
-    + will drop libraries any, array, compatability, for_each, function_types (replaced by CallableTraits), min_max, signals1, swap, typeof
-    + to be discussed library removals include assign, bind, call traits, enable_if,  integer, lambda, lexical_cast, member function, move, result_of, value_initialized
+  -  libraries to consider removing
+      + any -- c++17 replacement, minimal recent change
+      + array -- c++11 std:: replacement
+      + compatability -- really old for broken obsolete compilers
+      + for_each -- use range_for language feature
+      + function_types (replaced by CallableTraits, but lots of boost depend) 
+      + min_max -- std replacement in 11/14
+      + signals1 -- long deprecated lib
+      + swap  -- std replacement
+      + assign, bind, call traits, enable_if,  integer, lambda, lexical_cast, member function, move, result_of, value_initialized
     + testing will only target c++14 and beyond
     + advanced releases will be called boost2.x signalling a major revision
 
