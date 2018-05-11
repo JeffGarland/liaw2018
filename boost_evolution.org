@@ -83,6 +83,8 @@ date-time is an example of a library that could trivially be made header only du
 
 Deduction guides can simplify a user interface to a library.  This is C++17 and beyond only.  As an example from https://github.com/tvaneerd/cpp17_in_TTs/blob/master/ALL_IN_ONE.md
 
+
+#+BEGIN_SRC <c++>
  //c++14
  pair<int, string> is1 = pair<int, string>(17, "hello");
  auto is2 = std::pair<int, string>(17, "hello");
@@ -95,6 +97,7 @@ Deduction guides can simplify a user interface to a library.  This is C++17 and 
  auto is2 = pair(17, "hello"); // !! pair<int, char const *>
  auto is3 = pair(17, string("hello"));
  auto is4 = pair(17, "hello"s);
+#+END_SRC
 
 Note that without deduction guides for many of the boost container type libraries there is a risk of users used to using shortened names from std:: will get surprising results with boost. 
 
