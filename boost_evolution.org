@@ -182,10 +182,10 @@ The proposal is for a gradual deprecation of older compiler and standard support
   - 2021 LTS will move to C++14 and 11 will be dropped, advanced to 17
   - 2024 LTS will move to C++20 and 14 will be dropped, advanced to 20
 
-The follwoing timeline shows an example of the concept.  Dates aren't meant to be specific...
+The following timeline shows an example of the concept.  Dates aren't meant to be specific...
 
 #+caption: Example timeline
-[[[[file:boost_release.png]]]]
+[[file:boost_release.png]]
 
 
 *** dropping of std:: replaced libraries in advanced
