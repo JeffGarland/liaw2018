@@ -1,9 +1,9 @@
 
 * Maintaining Boost Libraries in Face of Rapidly Advancing Std C++
 
-The C++ library and language is now evolving at an unprecidented rate. This rapid evolution creates issues for boost library maintainers and users.  For maintainers keeping libraries operating with new C++ features and types requires significant effort. The user community has diverse needs including support for older C++ versions as well as newer standards.  
+The C++ library and language is now evolving at an unprecidented rate. This rapid evolution creates issues for boost library maintainers and users.  For maintainers keeping libraries operating with new C++ features and types requires significant effort. The user community has diverse needs including support for older C++ versions as well as newer standards.  In addition, whole libraries from Boost have been adopted into the standard reducing the overall value of some Boost libraries.
 
-As of this writing (May 2018) a poll of C++Now participants demonstrated majority C++11 usage with significant C++14 and C++17 usage.
+As of this writing (May 2018) a poll of C++Now participants demonstrated majority C++11 usage with significant C++14 and C++17 usage.  
 
 The following outlines some of the issues and potential solutions discussed during LIAW 2017 and 2018.
 
@@ -12,6 +12,14 @@ The following outlines some of the issues and potential solutions discussed duri
 New C++ language and library features are being added rapidly.  C++17
 added at least 100 new features and C++20 features already voted 
 into the standards (aka concepts) track will make large changes as well. 
+
+The issue of Boost libraries tracking this standard is only going to increase over time.  There's at least a few different scenarios for boost libraries including:
+ 
+ - drop in replacement: library is now in std (addressof, enable_if)
+ - partial replacement: library is in std, but has differences (thread, shared_ptr)
+ - library is in std, but quite different (date_time)
+ - library replaced by a lanauge feature (foreach, lambda)
+
 
 ** New std Library types
 
@@ -23,10 +31,9 @@ Maintaining a library that supports both boost and std types is complex and time
 
 *** shared_ptr interfaces in boost
 
-
 A particularly sticky case is boost::shared_ptr dependencies.  
 
-*** Example: date-time using boost::shared_ptr for time zones
+**** Example: date-time using boost::shared_ptr for time zones
 
 As a concrete example, boost.date-time users boost::shared_ptr for the management of time zone types.  With most users at C++11 it would make more sense for this interface to support std::shared_ptr instead.
 
@@ -34,10 +41,16 @@ Note this decision has some negative consequences for users of boost::shared_ptr
 
 So perhaps the better advice is for library authors to allow templatization on the pointer return type -- this would need to be prototyped.
 
-*** Other boost library of shared_ptr
+**** Other boost library of shared_ptr
 
 Libraries using shared_ptr in interface include: algorithm, asio, beast, contract, date-time, dll, exception, geometry, get_pointer, graph, iterator, locale, log, mpi, pointer_cast, process, program_options, property_map, python, serialization, signals, signals2, interprocess, iostreams, serialization,  shared_container, spirit, startechart, thread, type_erasure, type_index, uuid, wave.
 
+
+*** Updating for string_view
+
+Users of strings in c++17 would like to utilize string view.  Potentially impacted libraries include string_algo, tokenizer, regex.
+
+This section needs work!
 
 ** Using deprecated std types
 
@@ -45,9 +58,12 @@ The primary example here is std::auto_ptr.  Modern compilers in C++17 and higher
 
 A number of libraries use auto_ptr including asio, date-time, python, program_options, iostreams, assign, ptr_container, locale, and serialization.
 
+The following libraries have already worked around this issue as of 1.67 using boost.config macros: date-time, iostreams, ptr_container, python.
+
 The fix for auto_ptr is relatively straight forward.  Change to std::unique_ptr for c++11 mode and beyond.  
 
 Michael Caisse has pointed out there are some cases in boost where this is not possible.  These would be Howard H. code that uses auto_ptr. 
+
 
 ** Language features
 
@@ -92,25 +108,25 @@ Concepts will radically transform the construction of template libraries. Module
 
 ** Implementation headaches for library authors
 
--- Maintaining boost libraries is difficult to start.
--- No one will want to be a boost author if mired in c++98
--- Supporting legacy C++ compilers is a burden
--- #ifdef for all these c++ versions is painful and reduces maintainability
--- Limited community maintenance resources are already strained
+ - Maintaining boost libraries is difficult to start.
+ - No one will want to be a boost author if mired in c++98
+ - Supporting legacy C++ compilers is a burden
+ - #ifdef for all these c++ versions is painful and reduces maintainability
+ - Limited community maintenance resources are already strained
 
 
 * Potential Directions Forward
 
 ** Do nothing
 
--- let things continue to fester
--- provide no guidance
+ - let things continue to fester
+ - provide no guidance
 
 ** Individual library split 
 
--- Define standards and tools for developers to move to newer C++ versions
--- boostNN (aka boost17) namespace could be used to delinate libraries
--- individual authors/community support teams decide when to drop
+ - Define standards and tools for developers to move to newer C++ versions
+ - boostNN (aka boost17) namespace could be used to delinate libraries
+ - individual authors/community support teams decide when to drop
 
 ** Split into 2 - long term support (LTS) and boost.advanced
 
@@ -175,12 +191,12 @@ The following is a more detailed outline of an approach for discussion:
 
   - 2018 will become last full release with support for c++98/03
   - first LTS release targeted for 2019 with minimum c++11 support
-     -- subsequent LTS releases will continue with 1.xx release name
+     + subsequent LTS releases will continue with 1.xx release name
   - 2019 first advanced release
-    -- will drop libraries any, array, compatability, for_each, function_types (replaced by CallableTraits), integer, min_max, signals1, swap, typeof
-    -- to be discussed library removals include assign, bind, call traits, enable_if, lambda, lexical_cast, member function, move, result_of, value_initialized
-    -- testing will only target c++14 and beyond
-    -- advanced releases will be called boost2.x signalling a major revision
+    + will drop libraries any, array, compatability, for_each, function_types (replaced by CallableTraits), min_max, signals1, swap, typeof
+    + to be discussed library removals include assign, bind, call traits, enable_if,  integer, lambda, lexical_cast, member function, move, result_of, value_initialized
+    + testing will only target c++14 and beyond
+    + advanced releases will be called boost2.x signalling a major revision
 
 *** Implications
  
