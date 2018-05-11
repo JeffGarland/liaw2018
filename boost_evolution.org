@@ -1,7 +1,7 @@
 
 * Maintaining Boost Libraries in Face of Rapidly Advancing Std C++
 
-The C++ library and language is now evolving at an unprecidented rate. This rapid evolution creates issues for boost library maintainers and users.  For maintainers keeping libraries operating with new C++ features and types requires significant effort. The user community has diverse needs including support for older C++ versions as well as newer standards.  In addition, whole libraries from Boost have been adopted into the standard reducing the overall value of some Boost libraries.
+The C++ library and language is now evolving at an unprecedented rate. This rapid evolution creates issues for boost library maintainers and users.  For maintainers keeping libraries operating with new C++ features and types requires significant effort. The user community has diverse needs including support for older C++ versions as well as newer standards.  In addition, whole libraries from Boost have been adopted into the standard reducing the overall value of some Boost libraries.
 
 As of this writing (May 2018) a poll of C++Now participants demonstrated majority C++11 usage with significant C++14 and C++17 usage.  
 
@@ -25,7 +25,7 @@ The issue of Boost libraries tracking this standard is only going to increase ov
 
 The list of new library types since C++11 in the standard is long including std::optional, std::variant, std::shared_ptr, std::tuple, etc.  Many of these 'vocabulary types' are derived from similar boost types creating a tension for library authors about what to prefer.
 
-Users that are writing programs with C++11 and beyond will use these types and expect boost libraries to use and support them. It is acknoledged that some users will use boost components instead of std components due to feature extensions offered by boost.
+Users that are writing programs with C++11 and beyond will use these types and expect boost libraries to use and support them. It is acknowledged that some users will use boost components instead of std components due to feature extensions offered by boost.
 
 Maintaining a library that supports both boost and std types is complex and time consuming.  Also, some users would prefer a smaller version of boost that drops boost libraries now provided in the standard including: any, atomic, bind, endian, filesystem, lexical_cast, optional, regex, system, thread, and variant.  This list will grow in C++20 and beyond.
 
